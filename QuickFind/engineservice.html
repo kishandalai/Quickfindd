@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Engine Service Vendors</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="video-container">
+  <video autoplay muted loop playsinline>
+    <source src="./videos/bg.mp4" type="video/mp4">
+  </video>
+</div>
+
+<header><h1>Engine Service Vendors</h1></header>
+
+<nav>
+  <a href="mechanical.html"><button>Back</button></a>
+  <a href="bookings.html"><button>My Bookings</button></a>
+</nav>
+
+<div class="container services">
+
+  <div class="card">
+    <h3>EngineCare Pro</h3>
+    <p>📞 9876600001</p>
+    <button onclick="bookVendor('EngineCare Pro')">Book Now</button>
+  </div>
+
+  <div class="card">
+    <h3>Motor Experts</h3>
+    <p>📞 9876600002</p>
+    <button onclick="bookVendor('Motor Experts')">Book Now</button>
+  </div>
+
+  <div class="card">
+    <h3>Power Engine Repair</h3>
+    <p>📞 9876600003</p>
+    <button onclick="bookVendor('Power Engine Repair')">Book Now</button>
+  </div>
+
+  <div class="card">
+    <h3>Elite Engine Service</h3>
+    <p>📞 9876600004</p>
+    <button onclick="bookVendor('Elite Engine Service')">Book Now</button>
+  </div>
+
+  <div class="card">
+    <h3>Quick Engine Fix</h3>
+    <p>📞 9876600005</p>
+    <button onclick="bookVendor('Quick Engine Fix')">Book Now</button>
+  </div>
+
+</div>
+
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+collection,
+addDoc,
+serverTimestamp
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+apiKey: "AIzaSyCq_Dv4urFsCenU1XbjYxPBbqvLHosT0bI",
+authDomain: "quickfind-a84be.firebaseapp.com",
+projectId: "quickfind-a84be",
+storageBucket: "quickfind-a84be.firebasestorage.app",
+messagingSenderId: "656239050854",
+appId: "1:656239050854:web:2f2c3a72eaa6b686fbada7",
+measurementId: "G-EQJ2VS6VRM"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
+window.bookVendor = async function(vendorName)
+{
+
+const user = auth.currentUser;
+
+if (!user)
+{
+alert("Please login first");
+window.location.href="login.html";
+return;
+}
+
+const userRef = doc(db,"users",user.uid);
+const userSnap = await getDoc(userRef);
+const userData = userSnap.data();
+
+
+await addDoc(collection(db,"bookings"),{
+
+userId:user.uid,
+userEmail:userData.email,
+userName:userData.fullName,
+
+service:"Engine Service",
+vendor:vendorName,
+category:"Mechanical",
+
+status:"Pending",
+
+timestamp:serverTimestamp()
+
+});
+
+alert("Booked "+vendorName);
+
+}
+
+</script>
+
+</body>
+</html>

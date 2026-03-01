@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pipe Installation Vendors</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+.container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+padding:20px;
+}
+.card{
+background:transparent;
+padding:15px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+button{
+background:#28a745;
+color:white;
+border:none;
+padding:10px;
+width:100%;
+margin-top:10px;
+cursor:pointer;
+}
+button:hover{
+background:#218838;
+}
+</style>
+
+</head>
+<body>
+
+<div class="video-container">
+<video autoplay muted loop playsinline>
+<source src="./videos/bg.mp4">
+</video>
+</div>
+
+<header>
+<h1>Pipe Installation Vendors</h1>
+</header>
+
+<nav>
+<a href="plumbing.html"><button>Back</button></a>
+<a href="bookings.html"><button>My Bookings</button></a>
+</nav>
+
+<div class="container">
+
+<div class="card">
+<h3>Pipe Install Pro</h3>
+<p>Phone: 9876543220</p>
+<p>Area: Hyderabad</p>
+<button onclick="bookVendor('Pipe Install Pro')">Book Now</button>
+</div>
+
+<div class="card">
+<h3>Aqua Install</h3>
+<p>Phone: 9876543221</p>
+<p>Area: Hyderabad</p>
+<button onclick="bookVendor('Aqua Install')">Book Now</button>
+</div>
+
+<div class="card">
+<h3>PipeTech Services</h3>
+<p>Phone: 9876543222</p>
+<p>Area: Hyderabad</p>
+<button onclick="bookVendor('PipeTech Services')">Book Now</button>
+</div>
+
+<div class="card">
+<h3>Flow Install</h3>
+<p>Phone: 9876543223</p>
+<p>Area: Hyderabad</p>
+<button onclick="bookVendor('Flow Install')">Book Now</button>
+</div>
+
+<div class="card">
+<h3>Install Experts</h3>
+<p>Phone: 9876543224</p>
+<p>Area: Hyderabad</p>
+<button onclick="bookVendor('Install Experts')">Book Now</button>
+</div>
+
+</div>
+
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+collection,
+addDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyCq_Dv4urFsCenU1XbjYxPBbqvLHosT0bI",
+
+authDomain: "quickfind-a84be.firebaseapp.com",
+
+projectId: "quickfind-a84be",
+
+storageBucket: "quickfind-a84be.firebasestorage.app",
+
+messagingSenderId: "656239050854",
+
+appId: "1:656239050854:web:2f2c3a72eaa6b686fbada7"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+
+
+window.bookVendor = async function(vendorName){
+
+const user = auth.currentUser;
+
+if(!user){
+
+alert("Please login first");
+
+location.href="login.html";
+
+return;
+
+}
+
+
+const userSnap = await getDoc(doc(db,"users",user.uid));
+
+const userData = userSnap.data();
+
+
+await addDoc(collection(db,"bookings"),{
+
+userId:user.uid,
+
+userEmail:userData.email,
+
+userName:userData.fullName,
+
+service:"Pipe Installation",
+
+category:"Plumbing",
+
+vendor:vendorName,
+
+timestamp:serverTimestamp()
+
+});
+
+
+alert("Vendor booked successfully");
+
+}
+
+</script>
+
+</body>
+</html>

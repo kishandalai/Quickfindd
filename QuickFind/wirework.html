@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wiring Work Vendors</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="video-container">
+<video autoplay muted loop playsinline>
+<source src="./videos/bg.mp4">
+</video>
+</div>
+
+<header><h1>Wiring Work Vendors</h1></header>
+
+<nav>
+<a href="electrical.html"><button>Back</button></a>
+<a href="bookings.html"><button>My Bookings</button></a>
+</nav>
+
+<div class="container services">
+
+<div class="card">
+<h3>WirePro Electrical</h3>
+<p>📞 9876300001</p>
+<button onclick="bookVendor('WirePro Electrical')">Book Now</button>
+</div>
+
+<div class="card">
+<h3>SafeWire Solutions</h3>
+<p>📞 9876300002</p>
+<button onclick="bookVendor('SafeWire Solutions')">Book Now</button>
+</div>
+
+<div class="card">
+<h3>QuickWire Experts</h3>
+<p>📞 9876300003</p>
+<button onclick="bookVendor('QuickWire Experts')">Book Now</button>
+</div>
+
+<div class="card">
+<h3>PowerLine Electrical</h3>
+<p>📞 9876300004</p>
+<button onclick="bookVendor('PowerLine Electrical')">Book Now</button>
+</div>
+
+<div class="card">
+<h3>Elite Wiring Services</h3>
+<p>📞 9876300005</p>
+<button onclick="bookVendor('Elite Wiring Services')">Book Now</button>
+</div>
+
+</div>
+
+<!-- SAME FIREBASE SCRIPT AS ABOVE -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+collection,
+addDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyCq_Dv4urFsCenU1XbjYxPBbqvLHosT0bI",
+
+authDomain: "quickfind-a84be.firebaseapp.com",
+
+projectId: "quickfind-a84be",
+
+storageBucket: "quickfind-a84be.firebasestorage.app",
+
+messagingSenderId: "656239050854",
+
+appId: "1:656239050854:web:2f2c3a72eaa6b686fbada7"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+
+
+window.bookVendor = async function(vendorName){
+
+const user = auth.currentUser;
+
+if(!user){
+
+alert("Please login first");
+
+location.href="login.html";
+
+return;
+
+}
+
+
+const userSnap = await getDoc(doc(db,"users",user.uid));
+
+const userData = userSnap.data();
+
+
+await addDoc(collection(db,"bookings"),{
+
+userId:user.uid,
+
+userEmail:userData.email,
+
+userName:userData.fullName,
+
+service:"Bathroom Plumbing",
+
+category:"Plumbing",
+
+vendor:vendorName,
+
+timestamp:serverTimestamp()
+
+});
+
+
+alert("Vendor booked successfully");
+
+}
+
+</script>
+
+</body>
+</html>

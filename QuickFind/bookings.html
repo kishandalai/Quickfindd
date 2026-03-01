@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Bookings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- 🎥 Background Video -->
+<div class="video-container">
+  <video autoplay muted loop playsinline>
+    <source src="./videos/bg.mp4" type="video/mp4">
+  </video>
+</div>
+
+<header>
+  <h1 class="page-title">My Bookings</h1>
+</header>
+<nav>
+  <a href="home.html"><button>Back to Home</button></a>
+</nav>
+<div class="container">
+  <!-- IMPORTANT: id must match JS -->
+  <div id="list" class="services"></div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCq_Dv4urFsCenU1XbjYxPBbqvLHosT0bI",
+  authDomain: "quickfind-a84be.firebaseapp.com",
+  projectId: "quickfind-a84be",
+  storageBucket: "quickfind-a84be.firebasestorage.app",
+  messagingSenderId: "656239050854",
+  appId: "1:656239050854:web:2f2c3a72eaa6b686fbada7",
+  measurementId: "G-EQJ2VS6VRM"
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
+onAuthStateChanged(auth, async (user) => {
+
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const list = document.getElementById("list");
+
+  list.innerHTML = "Loading...";
+
+  try {
+
+    const q = query(
+      collection(db, "bookings"),
+      where("userId", "==", user.uid)
+    );
+
+    const snapshot = await getDocs(q);
+
+    list.innerHTML = "";
+
+    if (snapshot.empty) {
+      list.innerHTML = "<p>No bookings found</p>";
+      return;
+    }
+
+    snapshot.forEach(doc => {
+
+      const b = doc.data();
+
+      const date =
+        b.timestamp?.toDate().toLocaleString() || "N/A";
+
+      list.innerHTML += `
+        <div class="card">
+          <h3>${b.service}</h3>
+          <p>${b.category}</p>
+          <p>${date}</p>
+        </div>
+      `;
+
+    });
+
+  }
+  catch(e) {
+
+    console.error(e);
+    list.innerHTML = "Error loading bookings";
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>

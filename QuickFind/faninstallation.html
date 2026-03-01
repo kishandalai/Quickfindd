@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fan Installation Vendors</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="video-container">
+<video autoplay muted loop playsinline>
+<source src="./videos/bg.mp4" type="video/mp4">
+</video>
+</div>
+
+<header><h1>Fan Installation Vendors</h1></header>
+
+<nav>
+<a href="electrical.html"><button>Back</button></a>
+<a href="bookings.html"><button>My Bookings</button></a>
+</nav>
+
+<div class="container services">
+
+<div class="card">
+<h3>FanFix Experts</h3>
+<p>📞 9876100001</p>
+<button onclick="bookVendor('FanFix Experts')">Book Now</button>
+</div>
+
+<div class="card">
+<h3>QuickFan Service</h3>
+<p>📞 9876100002</p>
+<button onclick="bookVendor('QuickFan Service')">Book Now</button>
+</div>
+
+<div class="card">
+<h3>Elite Electricals</h3>
+<p>📞 9876100003</p>
+<button onclick="bookVendor('Elite Electricals')">Book Now</button>
+</div>
+
+<div class="card">
+<h3>FanCare Solutions</h3>
+<p>📞 9876100004</p>
+<button onclick="bookVendor('FanCare Solutions')">Book Now</button>
+</div>
+
+<div class="card">
+<h3>PowerFix Electrical</h3>
+<p>📞 9876100005</p>
+<button onclick="bookVendor('PowerFix Electrical')">Book Now</button>
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey:"AIzaSyCq_Dv4urFsCenU1XbjYxPBbqvLHosT0bI",
+authDomain:"quickfind-a84be.firebaseapp.com",
+projectId:"quickfind-a84be",
+storageBucket:"quickfind-a84be.firebasestorage.app",
+messagingSenderId:"656239050854",
+appId:"1:656239050854:web:2f2c3a72eaa6b686fbada7"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+window.bookVendor = async function(vendorName){
+
+const user = auth.currentUser;
+
+if(!user){
+alert("Login required");
+location.href="login.html";
+return;
+}
+
+const userSnap = await getDoc(doc(db,"users",user.uid));
+const userData = userSnap.data();
+
+await addDoc(collection(db,"bookings"),{
+
+userId:user.uid,
+userEmail:userData.email,
+userName:userData.fullName,
+
+service:"Fan Installation",
+vendor:vendorName,
+category:"Electrical",
+
+status:"Pending",
+timestamp:serverTimestamp()
+
+});
+
+alert("Booked "+vendorName);
+
+}
+
+</script>
+
+</body>
+</html>

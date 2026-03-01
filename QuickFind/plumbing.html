@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Plumbing Services</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+
+.container{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+padding:20px;
+}
+.card{
+background:transparent;
+padding:15px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+button{
+background:#28a745;
+color:white;
+border:none;
+padding:10px;
+width:100%;
+margin-top:10px;
+cursor:pointer;
+}
+button:hover{
+background:#218838;
+}
+</style>  
+</head>
+<body>
+    <!-- 🎥 Background Video -->
+<div class="video-container">
+  <video autoplay muted loop playsinline>
+    <source src="./videos/bg.mp4" type="video/mp4">
+  </video>
+</div>
+
+<header><h1>Plumbing Services</h1></header>
+<nav>
+  <a href="services.html"><button>Back</button></a>
+  <a href="bookings.html"><button>My Bookings</button></a>
+</nav>
+
+<div class="container services">
+  <div class="card">
+    <h3>Leak Fixing</h3>
+
+    <a href="leakfixing.html"><button>Contact</button></a>
+  </div>
+
+  <div class="card">
+    <h3>Pipe Installation</h3>
+
+    <a href="pipeinstallation.html"><button>Contact</button></a>
+  </div>
+
+  <div class="card">
+    <h3>Bathroom Plumbing</h3>
+
+    <a href="bathroomplumbing.html"><button>Contact</button></a>
+  </div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+// 🔥 SAME config as register/login
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCq_Dv4urFsCenU1XbjYxPBbqvLHosT0bI",
+  authDomain: "quickfind-a84be.firebaseapp.com",
+  projectId: "quickfind-a84be",
+  storageBucket: "quickfind-a84be.firebasestorage.app",
+  messagingSenderId: "656239050854",
+  appId: "1:656239050854:web:2f2c3a72eaa6b686fbada7",
+  measurementId: "G-EQJ2VS6VRM"
+};
+
+
+// Initialize
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
+// Booking function
+window.bookService = async function(serviceName) {
+
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("Please login first");
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+
+    // Get user info from Firestore
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      alert("User data not found");
+      return;
+    }
+
+    const userData = userSnap.data();
+
+    // Save booking
+    await addDoc(collection(db, "bookings"), {
+
+      userId: user.uid,
+      userEmail: userData.email,
+      userName: userData.fullName,
+
+      service: serviceName,
+      category: "Plumbing",
+
+      timestamp: serverTimestamp()
+
+    });
+
+    alert(serviceName + " booked successfully!");
+
+  }
+  catch(error) {
+
+    console.error(error);
+    alert("Booking failed");
+
+  }
+
+}
+
+</script>
+</body>
+</html>

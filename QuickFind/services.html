@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Services - QuickFind</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="services-page">
+  
+<!-- Slideshow Background -->
+<div class="slideshow-bg">
+  <img src="cleaning-service.jpg" class="slide" alt="Cleaning Service">
+  <img src="electrical-service.jpg" class="slide" alt="Electrical Service">
+  <img src="medical-service.jpg" class="slide" alt="Medical Service">
+  <img src="mechanical-service.jpg" class="slide" alt="Mechanical Service">
+  <img src="plumbing-service.jpg" class="slide" alt="Plumbing Service">
+</div>
+
+<header><h1>Services</h1></header>
+
+<nav>
+  <a href="home.html"><button>Home</button></a>
+  <a href="bookings.html"><button>My Bookings</button></a>
+  <a href="userqueries.html"><button>User Queries</button></a>
+</nav>
+
+<div class="container">
+  <div class="services">
+
+    <div class="card">
+      <h3>Home Cleaning</h3>
+      <p>Professional cleaning services</p>
+      <button onclick="location.href='cleaning.html'">View</button>
+    </div>
+
+    <div class="card">
+      <h3>Electrical Services</h3>
+      <p>Certified electricians</p>
+      <button onclick="location.href='electrical.html'">View</button>
+    </div>
+
+    <div class="card">
+      <h3>Medical Services</h3>
+      <p>Healthcare support</p>
+      <button onclick="location.href='medical.html'">View</button>
+    </div>
+
+  </div><br><br>
+  
+  <div class="services">
+    <!-- Mechanical Services -->
+    <div class="card">
+      <h3>Mechanical Services</h3>
+      <button onclick="location.href='mechanical.html'">View Services</button>
+    </div>
+
+    <!-- Plumbing Services -->
+    <div class="card">
+      <h3>Plumbing Services</h3>
+      <button onclick="location.href='plumbing.html'">View Services</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function bookService(serviceName) {
+  const user = localStorage.getItem("loggedInUser");
+
+  if (!user) {
+    alert("Please login first");
+    location.href = "login.html";
+    return;
+  }
+
+  const data = JSON.parse(localStorage.getItem("bookings")) || {};
+
+  if (!data[user]) {
+    data[user] = [];
+  }
+
+  data[user].push({
+    service: serviceName,
+    date: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("bookings", JSON.stringify(data));
+
+  alert(serviceName + " booked successfully!");
+}
+</script>
+
+<footer>© 2026 QuickFind</footer>
+
+</body>
+</html>

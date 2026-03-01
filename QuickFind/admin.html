@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - QuickFind</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Background Video -->
+<div class="video-container">
+  <video autoplay muted loop playsinline>
+    <source src="./videos/bg.mp4" type="video/mp4">
+  </video>
+</div>
+
+<header>
+  <h1>Admin Dashboard</h1>
+  <button onclick="logout()" class="admin-logout-btn">Logout</button>
+</header>
+
+<div class="container">
+  <!-- BOOKINGS ONLY -->
+  <h2 class="page-title">All User Bookings</h2>
+  <div class="services" id="bookingsList"></div>
+</div>
+
+<div class="container">
+  <!-- QUERIES ONLY -->
+  <h2 class="page-title">All User Queries</h2>
+  <div class="services" id="queriesList"></div>
+</div>
+
+<script type="module">
+
+/* ================= FIREBASE IMPORT ================= */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+/* ================= FIREBASE CONFIG ================= */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCq_Dv4urFsCenU1XbjYxPBbqvLHosT0bI",
+  authDomain: "quickfind-a84be.firebaseapp.com",
+  projectId: "quickfind-a84be",
+  storageBucket: "quickfind-a84be.firebasestorage.app",
+  messagingSenderId: "656239050854",
+  appId: "1:656239050854:web:2f2c3a72eaa6b686fbada7"
+};
+
+
+/* ================= INITIALIZE ================= */
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+
+const adminEmail = "admin@gmail.com";
+
+const bookingsList = document.getElementById("bookingsList");
+
+const queriesList = document.getElementById("queriesList");
+
+
+/* ================= AUTH CHECK ================= */
+
+onAuthStateChanged(auth, async (user) => {
+
+  if (!user)
+  {
+    alert("Please login first");
+    location.href = "login.html";
+    return;
+  }
+
+  if (user.email !== adminEmail)
+  {
+    alert("Admin access only");
+    location.href = "login.html";
+    return;
+  }
+
+  // LOAD BOTH
+  loadBookings();
+
+  loadQueries();
+
+});
+
+
+/* ================= LOAD BOOKINGS ================= */
+
+async function loadBookings()
+{
+
+  bookingsList.innerHTML = "Loading bookings...";
+
+  try
+  {
+
+    const q = query(
+      collection(db, "bookings"),
+      orderBy("timestamp", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+
+    bookingsList.innerHTML = "";
+
+    if (snapshot.empty)
+    {
+      bookingsList.innerHTML =
+      "<p>No bookings found</p>";
+      return;
+    }
+
+    snapshot.forEach(doc =>
+    {
+
+      const b = doc.data();
+
+      const date =
+      b.timestamp?.toDate().toLocaleString() || "N/A";
+
+      bookingsList.innerHTML +=
+      `
+      <div class="booking-card">
+
+        <div class="booking-header">
+          <h3>${b.service}</h3>
+          <span>${b.userEmail}</span>
+        </div>
+
+        <div class="booking-details">
+          <p>Name: ${b.userName}</p>
+          <p>Category: ${b.category}</p>
+          <p>Date: ${date}</p>
+        </div>
+
+      </div>
+      `;
+
+    });
+
+  }
+  catch(error)
+  {
+    console.error(error);
+    bookingsList.innerHTML =
+    "<p>Error loading bookings</p>";
+  }
+
+}
+
+
+/* ================= LOAD QUERIES ================= */
+
+async function loadQueries()
+{
+
+  queriesList.innerHTML = "Loading queries...";
+
+  try
+  {
+
+    const q = query(
+      collection(db, "queries"),
+      orderBy("timestamp", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+
+    queriesList.innerHTML = "";
+
+    if (snapshot.empty)
+    {
+      queriesList.innerHTML =
+      "<p>No queries found</p>";
+      return;
+    }
+
+    snapshot.forEach(doc =>
+    {
+
+      const data = doc.data();
+
+      const date =
+      data.timestamp?.toDate().toLocaleString() || "N/A";
+
+      queriesList.innerHTML +=
+      `
+      <div class="booking-card">
+
+        <div class="booking-header">
+          <h3>${data.service}</h3>
+          <span>${data.userEmail}</span>
+        </div>
+
+        <div class="booking-details">
+          <p>Name: ${data.userName}</p>
+          <p>Completed: ${data.serviceCompleted}</p>
+          <p>Experience: ${data.vendorExperience}</p>
+          <p>Description: ${data.description}</p>
+          <p>Date: ${date}</p>
+        </div>
+
+      </div>
+      `;
+
+    });
+
+  }
+  catch(error)
+  {
+    console.error(error);
+    queriesList.innerHTML =
+    "<p>Error loading queries</p>";
+  }
+
+}
+
+
+/* ================= LOGOUT ================= */
+
+window.logout = async function()
+{
+
+  await signOut(auth);
+
+  location.href = "login.html";
+
+};
+
+</script>
+</body>
+</html>

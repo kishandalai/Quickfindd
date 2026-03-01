@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>User Queries - QuickFind</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="auth-body">
+
+<div class="video-container">
+  <video autoplay muted loop playsinline>
+    <source src="./videos/bg.mp4" type="video/mp4">
+  </video>
+</div>
+
+<div class="auth-box">
+
+<h2>Service Feedback / Queries</h2>
+
+<form onsubmit="return submitQuery(event)">
+
+<input type="text" id="service" placeholder="Service Name" required>
+
+<label>Was your service completed?</label>
+
+<select id="status" required>
+<option value="">Select</option>
+<option value="Yes">Yes</option>
+<option value="No">No</option>
+</select>
+
+<label>Vendor experience</label>
+
+<select id="experience" required>
+<option value="">Select</option>
+<option value="Good">Good</option>
+<option value="Average">Average</option>
+<option value="Bad">Bad</option>
+</select>
+
+<textarea
+id="description"
+placeholder="Describe your query or issue"
+required
+></textarea>
+
+<button type="submit">Submit Query</button>
+
+<p id="msg"></p>
+
+</form>
+
+</div>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getAuth,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+collection,
+addDoc,
+serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCq_Dv4urFsCenU1XbjYxPBbqvLHosT0bI",
+  authDomain: "quickfind-a84be.firebaseapp.com",
+  projectId: "quickfind-a84be",
+  storageBucket: "quickfind-a84be.firebasestorage.app",
+  messagingSenderId: "656239050854",
+  appId: "1:656239050854:web:2f2c3a72eaa6b686fbada7",
+  measurementId: "G-EQJ2VS6VRM"
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+
+let currentUser = null;
+
+
+// Check login
+onAuthStateChanged(auth, (user) => {
+
+if(!user){
+
+alert("Login required");
+
+window.location.href="login.html";
+
+return;
+
+}
+
+currentUser = user;
+
+});
+
+
+// Submit query
+window.submitQuery = async function(event){
+
+event.preventDefault();
+
+const msg = document.getElementById("msg");
+
+const service =
+document.getElementById("service").value;
+
+const status =
+document.getElementById("status").value;
+
+const experience =
+document.getElementById("experience").value;
+
+const description =
+document.getElementById("description").value;
+
+
+try{
+
+// get user data
+const userRef =
+doc(db,"users",currentUser.uid);
+
+const userSnap =
+await getDoc(userRef);
+
+const userData =
+userSnap.data();
+
+
+// save query
+await addDoc(collection(db,"queries"),{
+
+userId: currentUser.uid,
+
+userEmail: userData.email,
+
+userName: userData.fullName,
+
+service: service,
+
+serviceCompleted: status,
+
+vendorExperience: experience,
+
+description: description,
+
+timestamp: serverTimestamp()
+
+});
+
+
+msg.style.color="green";
+
+msg.textContent="Query submitted successfully";
+
+}
+catch(error){
+
+msg.style.color="red";
+
+msg.textContent="Error submitting query";
+
+console.error(error);
+
+}
+
+}
+
+</script>
+</body>
+</html>

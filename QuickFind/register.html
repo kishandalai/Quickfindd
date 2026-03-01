@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Register - QuickFind</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="auth-body">
+  <!-- 🎥 Background Video -->
+<div class="video-container">
+  <video autoplay muted loop playsinline>
+    <source src="./videos/bg.mp4" type="video/mp4">
+  </video>
+</div>
+
+<div class="auth-box">
+  <h2>Register</h2>
+
+  <form onsubmit="return registerUser(event)">
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <input type="password" id="confirm" placeholder="Confirm Password" required>
+
+    <button type="submit">Register</button>
+  </form>
+
+  <p>Already have an account? <a href="login.html">Login</a></p>
+  <p id="msg"></p>
+</div>
+<script type="module">
+
+// Import Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  setDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCq_Dv4urFsCenU1XbjYxPBbqvLHosT0bI",
+  authDomain: "quickfind-a84be.firebaseapp.com",
+  projectId: "quickfind-a84be",
+  storageBucket: "quickfind-a84be.firebasestorage.app",
+  messagingSenderId: "656239050854",
+  appId: "1:656239050854:web:2f2c3a72eaa6b686fbada7",
+  measurementId: "G-EQJ2VS6VRM"
+};
+
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
+// Register function
+window.registerUser = async function(event) {
+
+  event.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const confirm = document.getElementById("confirm").value;
+
+  const msg = document.getElementById("msg");
+
+  if(password !== confirm)
+  {
+    msg.style.color = "red";
+    msg.textContent = "Passwords do not match";
+    return;
+  }
+
+  try {
+
+    // Create user in Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    const user = userCredential.user;
+
+    // Save extra data in Firestore
+    await setDoc(doc(db, "users", user.uid), {
+
+      fullName: name,
+      email: email,
+      createdAt: new Date(),
+      password: password
+
+    });
+
+    msg.style.color = "green";
+    msg.textContent = "Registration successful";
+
+    setTimeout(() => {
+      location.href = "login.html";
+    }, 1500);
+
+  }
+  catch(error)
+  {
+
+    msg.style.color = "red";
+    msg.textContent = error.message;
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>

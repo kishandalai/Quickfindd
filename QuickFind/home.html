@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>QuickFind</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- 🎥 Background Video -->
+<div class="video-container">
+  <video autoplay muted loop playsinline>
+    <source src="./videos/bg.mp4" type="video/mp4">
+  </video>
+</div>
+
+<!-- 🌫 Overlay Content -->
+<div class="overlay">
+
+  <header>
+    <h1>QuickFind</h1>
+    <p>Find Trusted Local Services Near You</p>
+  </header>
+
+
+
+  <nav>
+    <a href="home.html"><button>Home</button></a>
+    <a href="services.html"><button>Services</button></a>
+    <a href="bookings.html"><button>My Bookings</button></a>
+    <a href="login.html"><button>Login</button></a>
+    <a href="about.html"><button>About Us</button></a>
+    <a href="contact.html"><button>Contact Us</button></a>
+  </nav>
+
+
+<div class="container">
+  <h2 style="text-align: center;">
+Everything You Need, One QuickFind Away</h2>
+
+<p style="text-align: center;">Discover and book trusted local services—from home repairs to essential needs—all in one place</p>
+<p style="text-align: center;">Find trusted professionals near you and book instantly with QuickFind</p>
+</div>
+  
+<script>
+ 
+let currentSlide = 0;
+const slides = document.querySelectorAll(".slide");
+
+function showSlide(index) {
+  slides.forEach((slide, i) => {
+    slide.classList.toggle("active", i === index);
+  });
+}
+
+function changeSlide(step) {
+  currentSlide += step;
+
+  if (currentSlide >= slides.length) currentSlide = 0;
+  if (currentSlide < 0) currentSlide = slides.length - 1;
+
+  showSlide(currentSlide);
+}
+
+/* Auto slide */
+setInterval(() => {
+  changeSlide(1);
+}, 4000);
+ const user = localStorage.getItem("loggedInUser");
+
+if (!user) {
+  window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>

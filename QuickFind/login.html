@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login - QuickFind</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body class="auth-body">
+
+<!-- 🎥 Background Video -->
+<div class="video-container">
+  <video autoplay muted loop playsinline>
+    <source src="./videos/bg.mp4" type="video/mp4">
+  </video>
+</div>
+
+<div class="auth-box">
+  <h2>Login</h2>
+
+  <form onsubmit="return loginUser(event)">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+  </form>
+
+  <p>New user? <a href="register.html">Register</a></p>
+  <p id="msg"></p>
+</div>
+
+
+<!-- ✅ Firebase Login Script -->
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+// 🔥 Your Firebase config (use SAME config as register page)
+const firebaseConfig = {
+  apiKey: "AIzaSyCq_Dv4urFsCenU1XbjYxPBbqvLHosT0bI",
+  authDomain: "quickfind-a84be.firebaseapp.com",
+  projectId: "quickfind-a84be",
+  storageBucket: "quickfind-a84be.firebasestorage.app",
+  messagingSenderId: "656239050854",
+  appId: "1:656239050854:web:2f2c3a72eaa6b686fbada7",
+  measurementId: "G-EQJ2VS6VRM"
+};
+
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
+// ✅ Login function
+window.loginUser = async function(event) {
+
+  event.preventDefault();
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
+
+  try {
+
+    // 🔐 Authenticate user
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    const user = userCredential.user;
+
+    // 📂 Get user data from Firestore
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+
+    if(userDoc.exists()) {
+
+      const userData = userDoc.data();
+
+      msg.style.color = "green";
+      msg.textContent = "Login successful";
+
+      // Save login session
+      sessionStorage.setItem("loggedInUser", user.uid);
+
+      // Redirect based on admin
+      if(userData.email === "admin@gmail.com") {
+
+        window.location.href = "admin.html";
+
+      } else {
+
+        window.location.href = "home.html";
+
+      }
+
+    }
+    else {
+
+      msg.style.color = "red";
+      msg.textContent = "User data not found";
+
+    }
+
+  }
+  catch(error) {
+
+    msg.style.color = "red";
+    msg.textContent = "Invalid email or password";
+
+  }
+
+  return false;
+
+}
+
+</script>
+
+</body>
+</html>
